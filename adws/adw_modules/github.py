@@ -25,28 +25,20 @@ from .data_types import GitHubIssue, GitHubIssueListItem
 def get_github_env() -> Optional[dict]:
     """Get environment with GitHub token set up. Returns None if no GITHUB_PAT.
 
-    Subprocess env behavior:
-    - env=None → Inherits parent's environment (default)
-    - env={} → Empty environment (no variables)
-    - env=custom_dict → Only uses specified variables
+    Returns a copy of the current environment including:
+    - All system variables (HOME, PATH, etc.) needed by gh CLI
+    - GitHub token (if available) set as GH_TOKEN
 
-    So this will work with gh authentication:
-    # These are equivalent:
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    result = subprocess.run(cmd, capture_output=True, text=True, env=None)
-
-    But this will NOT work (no PATH, no auth):
-    result = subprocess.run(cmd, capture_output=True, text=True, env={})
+    This ensures gh commands run via subprocess have access to their config
+    and can authenticate with GitHub.
     """
     github_pat = os.getenv("GITHUB_PAT")
     if not github_pat:
         return None
 
-    # Only create minimal env with GitHub token
-    env = {
-        "GH_TOKEN": github_pat,
-        "PATH": os.environ.get("PATH", ""),
-    }
+    # Copy full environment to preserve system variables gh CLI needs
+    env = os.environ.copy()
+    env["GH_TOKEN"] = github_pat
     return env
 
 
