@@ -1,0 +1,7 @@
+{
+  "adw_id": "7233056f",
+  "issue_number": "3",
+  "branch_name": "bug-3-7233056f-fix-vercel-api-fetch",
+  "plan_file": "specs/bug-3-vercel-api-fetch-fail.md",
+  "issue_class": "/bug"
+}

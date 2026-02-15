@@ -1,0 +1,25 @@
+/find_plan_file 3 7233056f ## Report
+
+I've successfully created a bug plan to resolve the Vercel API fetch issue. Here's a summary:
+
+**Analysis:**
+- The bug occurs because the frontend client (`app/client/src/utils/api.js`) uses a hardcoded base URL that defaults to `http://localhost:3001`
+- In Vercel production, this causes the browser to try connecting to `localhost:3001`, which doesn't exist, resulting in `ERR_CONNECTION_REFUSED`
+- The root cause is line 1 in `api.js`: `const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';`
+
+**Solution:**
+- Change the API base URL to use relative URLs (`''`) instead of absolute `http://localhost:3001`
+- This works because:
+  - Development: Vite proxy (configured in `vite.config.js`) forwards `/api/*` to `localhost:3001`
+  - Production: Vercel routes (configured in `vercel.json`) forward `/api/*` to the serverless function
+
+**Key Benefits:**
+- Minimal change (single line in one file)
+- No environment variable configuration needed
+- Works in both development and production
+- Leverages existing infrastructure
+
+**Plan file created at:**
+- `specs/bug-3-vercel-api-fetch-fail.md`
+
+The plan includes detailed root cause analysis, step-by-step implementation tasks, and comprehensive validation commands to ensure the fix works with zero regressions.
