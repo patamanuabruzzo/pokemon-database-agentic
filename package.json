@@ -16,6 +16,7 @@
     "dev:server": "turbo run dev --filter=@pokemon-db/server",
     "dev:agent": "turbo run dev --filter=@pokemon-db/agent",
     "build:client": "turbo run build --filter=@pokemon-db/client",
+    "build:client:vercel": "cd app/client && npm install && npm run build && cd ../..",
     "build:server": "turbo run build --filter=@pokemon-db/server",
     "start:server": "turbo run start --filter=@pokemon-db/server",
     "test:e2e": "playwright test",
