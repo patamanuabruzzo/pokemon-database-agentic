@@ -1,13 +1,13 @@
 # E2E Test Runner
 
-Execute end-to-end (E2E) tests using Playwright browser automation (MCP Server). If any errors occur and assertions fail mark the test as failed and explain exactly what went wrong.
+Execute end-to-end (E2E) tests using Playwright browser automation. If any errors occur and assertions fail mark the test as failed and explain exactly what went wrong.
 
 ## Variables
 
 adw_id: $1 if provided, otherwise generate a random 8 character hex string
 agent_name: $2 if provided, otherwise use 'test_e2e'
 e2e_test_file: $3
-application_url: $4 if provided, otherwise use http://localhost:5173
+application_url: $4 if provided, otherwise use http://localhost:3000
 
 ## Instructions
 
@@ -19,19 +19,23 @@ application_url: $4 if provided, otherwise use http://localhost:5173
 - Capture screenshots as specified
 - IMPORTANT: Return results in the format requested by the `Output Format`
 - Initialize Playwright browser in headed mode for visibility
-- Use the `application_url`
+- Use the `application_url` (default: http://localhost:3000)
 - Allow time for async operations and element visibility
 - IMPORTANT: After taking each screenshot, save it to `Screenshot Directory` with descriptive names. Use absolute paths to move the files to the `Screenshot Directory` with the correct name.
 - Capture and report any errors encountered
 - Ultra think about the `Test Steps` and execute them in order
-- If you encounter an error, mark the test as failed immediately and explain exactly what went wrong and on what step it occurred. For example: '(Step 1 ❌) Failed to find element with selector "query-input" on page "http://localhost:5173"'
+- If you encounter an error, mark the test as failed immediately and explain exactly what went wrong and on what step it occurred. For example: '(Step 1 ❌) Failed to find element with selector "search-input" on page "http://localhost:3000"'
 - Use `pwd` or equivalent to get the absolute path to the codebase for writing and displaying the correct paths to the screenshots
 
 ## Setup
 
-- IMPORTANT: Reset the database by running `scripts/reset_db.sh`
-- IMPORTANT: Make sure the server and client are running on a background process before executing the test steps. Read `scripts/` and `README.md` for more information on how to start, stop and reset the server and client
-
+- IMPORTANT: Ensure both frontend and backend are running before executing tests
+- Start frontend: `npm run dev:client` (runs on port 3000)
+- Start backend: `npm run dev:server` (runs on port 3001)
+- Verify services are ready:
+  - Frontend: `curl http://localhost:3000` should return HTML
+  - Backend: `curl http://localhost:3001/health` should return JSON with status "ok"
+- If servers are not running, the tests will fail
 
 ## Screenshot Directory
 
@@ -40,7 +44,7 @@ application_url: $4 if provided, otherwise use http://localhost:5173
 Each screenshot should be saved with a descriptive name that reflects what is being captured. The directory structure ensures that:
 - Screenshots are organized by ADW ID (workflow run)
 - They are stored under the specified agent name (e.g., e2e_test_runner_0, e2e_test_resolver_iter1_0)
-- Each test has its own subdirectory based on the test file name (e.g., test_basic_query → basic_query/)
+- Each test has its own subdirectory based on the test file name (e.g., test_pokemon_search → pokemon_search/)
 
 ## Report
 

@@ -1,13 +1,14 @@
 # Application Validation Test Suite
 
-Execute comprehensive validation tests for frontend components, returning results in a standardized JSON format for automated processing.
+Execute comprehensive validation tests for frontend and backend components, returning results in a standardized JSON format for automated processing.
 
 ## Purpose
 
 Proactively identify and fix issues in the application before they impact users or developers. By running this comprehensive test suite, you can:
-- Detect syntax errors, type mismatches, and import failures
-- Identify broken tests or security vulnerabilities  
+- Detect syntax errors and import failures
 - Verify build processes and dependencies
+- Ensure servers start correctly
+- Validate API endpoints
 - Ensure the application is in a healthy state
 
 ## Variables
@@ -29,8 +30,6 @@ TEST_COMMAND_TIMEOUT: 5 minutes
   - Capture stderr output for error field
   - Timeout commands after `TEST_COMMAND_TIMEOUT`
   - IMPORTANT: If a test fails, stop processing tests and return the results thus far
-- Some tests may have dependencies (e.g., server must be stopped for port availability)
-- API health check is required
 - Test execution order is important - dependencies should be validated first
 - All file paths are relative to the project root
 - Always run `pwd` and `cd` before each test to ensure you're operating in the correct directory for the given test
@@ -39,23 +38,25 @@ TEST_COMMAND_TIMEOUT: 5 minutes
 
 ### Frontend Tests
 
-1. **TypeScript Type Check**
+1. **Frontend Build**
    - Preparation Command: None
-   - Command: `npx tsc --noEmit`
-   - test_name: "typescript_check"
-   - test_purpose: "Validates TypeScript type correctness without generating output files, catching type errors, missing imports, and incorrect function signatures"
-
-2. **Frontend Linting**
-   - Preparation Command: None
-   - Command: `npm run lint`
-   - test_name: "frontend_linting"
-   - test_purpose: "Validates frontend code quality using ESLint, identifies code style issues and potential bugs"
-
-3. **Frontend Build**
-   - Preparation Command: None
-   - Command: `npm run build`
+   - Command: `npm run build:client`
    - test_name: "frontend_build"
-   - test_purpose: "Validates the complete Next.js frontend build process including bundling, asset optimization, and production compilation"
+   - test_purpose: "Validates the complete Vite frontend build process including bundling, asset optimization, and production compilation"
+
+2. **Frontend Dev Server**
+   - Preparation Command: None
+   - Command: `timeout 10 bash -c "npm run dev:client & sleep 5 && curl -f http://localhost:3000 && pkill -f vite" || pkill -f vite`
+   - test_name: "frontend_dev_server"
+   - test_purpose: "Validates that the Vite development server starts successfully and serves content on port 3000"
+
+### Backend Tests
+
+3. **Backend Health Check**
+   - Preparation Command: None
+   - Command: `timeout 10 bash -c "npm run dev:server & sleep 3 && curl -f http://localhost:3001/health && pkill -f 'node.*server'" || pkill -f 'node.*server'`
+   - test_name: "backend_health_check"
+   - test_purpose: "Validates that the Express backend starts and responds to health check endpoint on port 3001"
 
 ## Report
 
@@ -85,23 +86,23 @@ TEST_COMMAND_TIMEOUT: 5 minutes
 ```json
 [
   {
-    "test_name": "frontend_build",
+    "test_name": "backend_health_check",
     "passed": false,
-    "execution_command": "npm run build",
-    "test_purpose": "Validates the complete Next.js frontend build process including bundling, asset optimization, and production compilation",
-    "error": "TS2345: Argument of type 'string' is not assignable to parameter of type 'number'"
+    "execution_command": "timeout 10 bash -c \"npm run dev:server & sleep 3 && curl -f http://localhost:3001/health && pkill -f 'node.*server'\" || pkill -f 'node.*server'",
+    "test_purpose": "Validates that the Express backend starts and responds to health check endpoint on port 3001",
+    "error": "curl: (7) Failed to connect to localhost port 3001: Connection refused"
   },
   {
-    "test_name": "typescript_check",
+    "test_name": "frontend_build",
     "passed": true,
-    "execution_command": "npx tsc --noEmit",
-    "test_purpose": "Validates TypeScript type correctness without generating output files, catching type errors, missing imports, and incorrect function signatures"
+    "execution_command": "npm run build:client",
+    "test_purpose": "Validates the complete Vite frontend build process including bundling, asset optimization, and production compilation"
   },
   {
-    "test_name": "frontend_linting",
+    "test_name": "frontend_dev_server",
     "passed": true,
-    "execution_command": "npm run lint",
-    "test_purpose": "Validates frontend code quality using ESLint, identifies code style issues and potential bugs"
+    "execution_command": "timeout 10 bash -c \"npm run dev:client & sleep 5 && curl -f http://localhost:3000 && pkill -f vite\" || pkill -f vite",
+    "test_purpose": "Validates that the Vite development server starts successfully and serves content on port 3000"
   }
 ]
 ```

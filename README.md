@@ -148,6 +148,109 @@ npm run build:client   # Build only frontend (turbo run build --filter=@pokemon-
 npm run dev:client     # Run frontend dev server
 ```
 
+## Development Automation (ADW)
+
+This project includes a **Python-based AI Developer Workflow (ADW)** system for automating GitHub issue processing. The ADW system is separate from the Node.js application and is used by maintainers to automate development tasks.
+
+### Architecture Overview
+
+```
+pokemon-database-agentic/
+├── app/          # Node.js application (React + Express)
+├── agent/        # Node.js agentic features (to be implemented)
+└── adws/         # Python development automation (GitHub issue processing)
+```
+
+### ADW Setup (Optional - For Project Maintainers Only)
+
+The ADW system automates development workflows by processing GitHub issues and creating pull requests automatically.
+
+**Prerequisites:**
+- Python 3.12 or higher
+- [uv](https://docs.astral.sh/uv/) package manager
+- GitHub CLI (`gh`) authenticated
+- Claude Code CLI
+
+**Installation:**
+
+1. **Install Python and uv:**
+   ```bash
+   # macOS/Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+
+   # Windows
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+
+2. **Install GitHub CLI and authenticate:**
+   ```bash
+   # macOS
+   brew install gh
+
+   # Ubuntu/Debian
+   sudo apt install gh
+
+   # Windows
+   winget install --id GitHub.cli
+
+   # Authenticate
+   gh auth login
+   ```
+
+3. **Configure environment variables in `.env`:**
+   ```bash
+   # Required for ADW
+   GITHUB_REPO_URL=https://github.com/your-username/pokemon-database-agentic
+   ANTHROPIC_API_KEY=your_anthropic_api_key_here
+
+   # Optional - only if using different account than 'gh auth login'
+   GITHUB_PAT=your_github_personal_access_token
+   ```
+
+4. **Install ADW dependencies:**
+   ```bash
+   cd adws
+   uv sync
+   ```
+
+### Using ADW
+
+**Process a specific GitHub issue:**
+```bash
+cd adws
+
+# Plan and implement solution for issue #123
+uv run adw_plan_build.py 123
+
+# Full pipeline with testing
+uv run adw_plan_build_test.py 123
+```
+
+**Enable automatic issue processing:**
+```bash
+cd adws
+
+# Polls GitHub every 20 seconds for new issues
+uv run adw_triggers/trigger_cron.py
+
+# Or start webhook server for instant processing
+uv run adw_triggers/trigger_webhook.py
+```
+
+**What ADW does:**
+1. Fetches issue details from GitHub
+2. Classifies issue type (`/feature`, `/bug`, `/chore`)
+3. Creates a feature branch
+4. Generates implementation plan using Claude
+5. Implements the solution
+6. Runs tests
+7. Creates commits and pull request
+8. Links everything back to the original issue
+
+See [adws/README.md](./adws/README.md) for complete ADW documentation.
+
+**Note:** ADW is optional. Contributors can work on the project without setting up the Python automation system. It's primarily for maintainers who want to automate their development workflow.
+
 ## License
 
 This is a practice project for educational purposes.
