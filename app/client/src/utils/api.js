@@ -55,7 +55,14 @@ export async function getPokemonDetails(name) {
       throw new Error(`Failed to fetch Pokemon details: ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`[Frontend API] Pokemon details received for: ${name}`, {
+      hasSprites: !!data.sprites,
+      hasStats: !!data.stats && data.stats.length > 0,
+      hasAbilities: !!data.abilities && data.abilities.length > 0,
+      hasEvolution: !!data.evolution
+    });
+    return data;
   } catch (error) {
     console.error('API detail error:', error);
     throw error;
