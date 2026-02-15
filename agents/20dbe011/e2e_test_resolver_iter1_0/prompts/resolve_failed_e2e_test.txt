@@ -1,0 +1,7 @@
+/resolve_failed_e2e_test {
+  "test_name": "pokemon-e2e-tests",
+  "status": "failed",
+  "test_path": ".claude/commands/e2e\\pokemon-e2e-tests.md",
+  "screenshots": [],
+  "error": "Result parsing error: Failed to parse JSON: Expecting value: line 1 column 1 (char 0). Text was: Perfect! Both frontend and backend servers completed their startup successfully. The E2E test execution is complete with all 48 tests passing.\n\n## Summary\n\n**Status: ✅ ALL TESTS PASSED**\n\n- 48/48 Play..."
+}

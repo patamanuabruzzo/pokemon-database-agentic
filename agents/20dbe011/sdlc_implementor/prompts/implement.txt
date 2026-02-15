@@ -1,0 +1,1 @@
+/implement specs/feature-7-improve-pokemon-view.md
