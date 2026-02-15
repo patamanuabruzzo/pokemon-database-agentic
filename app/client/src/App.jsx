@@ -122,6 +122,7 @@ function App() {
               pokemon={pokemonDetail}
               loading={detailLoading}
               error={detailError}
+              onSelectPokemon={handleSelectPokemon}
             />
           </div>
         </div>
