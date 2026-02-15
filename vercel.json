@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "(cd app/client && npm install && npm run build)",
+  "buildCommand": "ls -la && cd app/client && npm install && npm run build",
   "outputDirectory": "app/client/dist",
   "devCommand": "npm run dev:client",
   "installCommand": "echo 'Skipping root install'",
