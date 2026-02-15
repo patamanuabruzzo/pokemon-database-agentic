@@ -1,0 +1,28 @@
+{
+  "name": "pokemon-database-agentic",
+  "version": "1.0.0",
+  "description": "A practice project for agentic applications with Pokemon search",
+  "private": true,
+  "workspaces": [
+    "app/client",
+    "app/server",
+    "agent"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm install --workspace=app/client && npm install --workspace=app/server && npm install --workspace=agent",
+    "dev:client": "npm run dev --workspace=app/client",
+    "dev:server": "npm run dev --workspace=app/server",
+    "dev:agent": "npm run dev --workspace=agent",
+    "build:client": "npm run build --workspace=app/client",
+    "build:server": "npm run build --workspace=app/server",
+    "start:server": "npm run start --workspace=app/server"
+  },
+  "keywords": [
+    "pokemon",
+    "agentic",
+    "nodejs",
+    "vercel"
+  ],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git remote add:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: Agent Layer Primitives framework\n\nAdd minimum viable agentic layer implementation demonstrating:\n- AI Developer Workflows \\(ADWs\\) for agent orchestration\n- Slash command templates for reusable prompts\n- Agent execution modules \\(subprocess and SDK-based\\)\n- Example specifications and planning documents\n- Basic application layer with Python/TypeScript hello world\n\nThis framework templates engineering patterns and teaches agents\nhow to operate codebases, enabling compute-scalable development.\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(uv run:*)",
+      "Bash(bun run:*)",
+      "Bash(.venv/Scripts/python.exe -c \"import sys; sys.path.insert\\(0, ''.''\\); import apps.server; print\\(''✓ Server module imports successfully''\\)\")",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run dev:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "Bash(claude:*)",
+      "Bash(gh issue view:*)"
+    ]
+  }
+}
