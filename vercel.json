@@ -1,8 +1,8 @@
 {
-  "buildCommand": "npm run build:client",
+  "buildCommand": "cd app/client && npm install && npm run build",
   "outputDirectory": "app/client/dist",
   "devCommand": "npm run dev:client",
-  "installCommand": "npm install",
+  "installCommand": "npm install --prefix app/client",
   "rewrites": [
     {
       "source": "/api/(.*)",
