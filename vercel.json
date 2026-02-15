@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "sh build-vercel.sh",
+  "buildCommand": "(cd app/client && npm install && npm run build)",
   "outputDirectory": "app/client/dist",
   "devCommand": "npm run dev:client",
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "echo 'Skipping root install'",
   "framework": null,
   "routes": [
     {
