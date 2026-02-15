@@ -93,6 +93,61 @@ npm run build:client
 npm run build:server
 ```
 
+## Deployment
+
+### Deploying to Vercel
+
+This project uses **Turborepo** for monorepo management and is optimized for Vercel deployment.
+
+#### Initial Setup
+
+1. Push your code to GitHub
+2. Import the project in Vercel: https://vercel.com/new
+3. Select your repository
+
+#### Required Configuration
+
+**IMPORTANT:** In Vercel Project Settings → Build & Development Settings, configure:
+
+```
+Framework Preset: Other (or Vite)
+Build Command: npm run build:client
+Output Directory: app/client/dist
+Install Command: npm install
+Root Directory: (leave empty)
+```
+
+**Make sure to check the "Override" checkbox** for each setting so Vercel uses your configuration instead of auto-detection.
+
+#### Verification
+
+After deployment, check:
+- Frontend: `https://your-project.vercel.app/` - Should display the React app
+- API Health: `https://your-project.vercel.app/api/health` - Should return JSON status
+
+#### Common Issues
+
+- **404 NOT_FOUND Error**: Vercel project settings are not configured correctly. Ensure Build & Development Settings match the configuration above and "Override" is enabled.
+- **Build takes < 1 second**: Build command is not running. Check project settings and redeploy.
+- **API routes not working**: Verify `vercel.json` routes configuration is present.
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment troubleshooting.
+
+## Monorepo Management
+
+This project uses **Turborepo** to manage the monorepo structure:
+
+- Efficient build caching and parallelization
+- Proper workspace dependency resolution
+- Native Vercel integration for optimized deployments
+
+All build commands use Turborepo under the hood:
+```bash
+npm run build          # Build all workspaces
+npm run build:client   # Build only frontend (turbo run build --filter=@pokemon-db/client)
+npm run dev:client     # Run frontend dev server
+```
+
 ## License
 
 This is a practice project for educational purposes.
