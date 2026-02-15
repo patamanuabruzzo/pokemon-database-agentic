@@ -1,15 +1,22 @@
 """Git operations for ADW composable architecture.
 
 Provides centralized git operations that build on top of github.py module.
+Includes hybrid SSH/HTTPS authentication with automatic fallback.
 """
 
 import json
 import logging
+import os
 import subprocess
 from typing import TYPE_CHECKING, Optional, Tuple
 
 # Import GitHub functions from existing module
-from adw_modules.github import extract_repo_path, get_repo_url, make_issue_comment
+from adw_modules.github import (
+    extract_repo_path,
+    get_git_env,
+    get_repo_url,
+    make_issue_comment,
+)
 
 if TYPE_CHECKING:
     from adw_modules.state import ADWState
@@ -18,19 +25,120 @@ if TYPE_CHECKING:
 def get_current_branch() -> str:
     """Get current git branch name."""
     result = subprocess.run(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+        capture_output=True,
+        text=True,
+        env=get_git_env(),
     )
     return result.stdout.strip()
 
 
+def _push_branch_https(branch_name: str, github_pat: str) -> Tuple[bool, Optional[str]]:
+    """Push branch using HTTPS with token authentication.
+
+    Args:
+        branch_name: Name of the branch to push
+        github_pat: GitHub Personal Access Token
+
+    Returns:
+        Tuple of (success, error_message)
+    """
+    try:
+        # Get current remote URL
+        repo_url = get_repo_url()
+        repo_path = extract_repo_path(repo_url)
+
+        # Create HTTPS URL with embedded token
+        https_url = f"https://{github_pat}@github.com/{repo_path}.git"
+
+        # Temporarily set remote to HTTPS
+        result = subprocess.run(
+            ["git", "remote", "set-url", "origin", https_url],
+            capture_output=True,
+            text=True,
+            env=get_git_env(),
+        )
+
+        if result.returncode != 0:
+            return False, f"Failed to set HTTPS remote: {result.stderr}"
+
+        # Push with HTTPS
+        result = subprocess.run(
+            ["git", "push", "-u", "origin", branch_name],
+            capture_output=True,
+            text=True,
+            env=get_git_env(),
+        )
+
+        # Restore SSH remote URL
+        if repo_url.startswith("git@github.com:"):
+            subprocess.run(
+                ["git", "remote", "set-url", "origin", repo_url],
+                capture_output=True,
+                text=True,
+                env=get_git_env(),
+            )
+
+        if result.returncode != 0:
+            return False, result.stderr
+
+        return True, None
+
+    except Exception as e:
+        return False, f"HTTPS push failed: {str(e)}"
+
+
 def push_branch(branch_name: str) -> Tuple[bool, Optional[str]]:
-    """Push current branch to remote. Returns (success, error_message)."""
+    """Push current branch to remote with hybrid SSH/HTTPS authentication.
+
+    Attempts SSH first (using SSH agent), then falls back to HTTPS with token
+    if SSH fails due to authentication issues.
+
+    Args:
+        branch_name: Name of the branch to push
+
+    Returns:
+        Tuple of (success, error_message)
+    """
+    # Try SSH first with full environment (includes SSH agent)
     result = subprocess.run(
-        ["git", "push", "-u", "origin", branch_name], capture_output=True, text=True
+        ["git", "push", "-u", "origin", branch_name],
+        capture_output=True,
+        text=True,
+        env=get_git_env(),
     )
-    if result.returncode != 0:
+
+    if result.returncode == 0:
+        return True, None
+
+    # Check if failure is due to SSH authentication
+    stderr_lower = result.stderr.lower()
+    is_auth_failure = any(
+        phrase in stderr_lower
+        for phrase in [
+            "permission denied (publickey)",
+            "could not read from remote repository",
+            "authentication failed",
+        ]
+    )
+
+    if not is_auth_failure:
+        # Different error, don't try HTTPS fallback
         return False, result.stderr
-    return True, None
+
+    # Try HTTPS fallback if token is available
+    github_pat = os.getenv("GITHUB_PAT")
+    if github_pat:
+        print("SSH authentication failed, attempting HTTPS with token...")
+        success, error = _push_branch_https(branch_name, github_pat)
+        if success:
+            print("Successfully pushed using HTTPS authentication")
+            return True, None
+        else:
+            return False, f"SSH failed: {result.stderr}\nHTTPS fallback also failed: {error}"
+
+    # No token available for HTTPS fallback
+    return False, f"{result.stderr}\n\nHint: Set GITHUB_PAT environment variable to enable HTTPS fallback"
 
 
 def check_pr_exists(branch_name: str) -> Optional[str]:
@@ -57,13 +165,21 @@ def check_pr_exists(branch_name: str) -> Optional[str]:
 def create_branch(branch_name: str) -> Tuple[bool, Optional[str]]:
     """Create and checkout a new branch. Returns (success, error_message)."""
     # Create branch
-    result = subprocess.run(["git", "checkout", "-b", branch_name], capture_output=True, text=True)
+    result = subprocess.run(
+        ["git", "checkout", "-b", branch_name],
+        capture_output=True,
+        text=True,
+        env=get_git_env(),
+    )
     if result.returncode != 0:
         # Check if error is because branch already exists
         if "already exists" in result.stderr:
             # Try to checkout existing branch
             result = subprocess.run(
-                ["git", "checkout", branch_name], capture_output=True, text=True
+                ["git", "checkout", branch_name],
+                capture_output=True,
+                text=True,
+                env=get_git_env(),
             )
             if result.returncode != 0:
                 return False, result.stderr
@@ -75,17 +191,29 @@ def create_branch(branch_name: str) -> Tuple[bool, Optional[str]]:
 def commit_changes(message: str) -> Tuple[bool, Optional[str]]:
     """Stage all changes and commit. Returns (success, error_message)."""
     # Check if there are changes to commit
-    result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        capture_output=True,
+        text=True,
+        env=get_git_env(),
+    )
     if not result.stdout.strip():
         return True, None  # No changes to commit
 
     # Stage all changes
-    result = subprocess.run(["git", "add", "-A"], capture_output=True, text=True)
+    result = subprocess.run(
+        ["git", "add", "-A"], capture_output=True, text=True, env=get_git_env()
+    )
     if result.returncode != 0:
         return False, result.stderr
 
     # Commit
-    result = subprocess.run(["git", "commit", "-m", message], capture_output=True, text=True)
+    result = subprocess.run(
+        ["git", "commit", "-m", message],
+        capture_output=True,
+        text=True,
+        env=get_git_env(),
+    )
     if result.returncode != 0:
         return False, result.stderr
     return True, None

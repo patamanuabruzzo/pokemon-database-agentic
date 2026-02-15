@@ -50,6 +50,28 @@ def get_github_env() -> Optional[dict]:
     return env
 
 
+def get_git_env() -> dict:
+    """Get environment for git operations with SSH agent support.
+
+    Returns a copy of the current environment including:
+    - SSH agent variables (SSH_AUTH_SOCK, SSH_AGENT_PID) for SSH authentication
+    - PATH and other system variables
+    - GitHub token (if available) for HTTPS fallback
+
+    This ensures git commands run via subprocess have access to SSH keys
+    and can authenticate with GitHub.
+    """
+    # Start with full environment to preserve SSH agent and other variables
+    env = os.environ.copy()
+
+    # Optionally add GitHub token for HTTPS fallback
+    github_pat = os.getenv("GITHUB_PAT")
+    if github_pat:
+        env["GH_TOKEN"] = github_pat
+
+    return env
+
+
 def get_repo_url() -> str:
     """Get GitHub repository URL from git remote."""
     try:
@@ -69,8 +91,19 @@ def get_repo_url() -> str:
 
 
 def extract_repo_path(github_url: str) -> str:
-    """Extract owner/repo from GitHub URL."""
-    # Handle both https://github.com/owner/repo and https://github.com/owner/repo.git
+    """Extract owner/repo from GitHub URL.
+
+    Handles multiple formats:
+    - https://github.com/owner/repo
+    - https://github.com/owner/repo.git
+    - git@github.com:owner/repo.git
+    """
+    # Handle SSH format: git@github.com:owner/repo.git
+    if github_url.startswith("git@github.com:"):
+        repo_path = github_url.replace("git@github.com:", "").replace(".git", "")
+        return repo_path
+
+    # Handle HTTPS format: https://github.com/owner/repo.git
     return github_url.replace("https://github.com/", "").replace(".git", "")
 
 

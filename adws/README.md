@@ -285,6 +285,22 @@ export GITHUB_PAT=$(gh auth token)
 cat agents/*/sdlc_planner/raw_output.jsonl | tail -1 | jq .
 ```
 
+**"Permission denied (publickey)" or git push/pull failures**
+```bash
+# ADW uses hybrid SSH/HTTPS authentication
+# See detailed troubleshooting guide:
+# GIT_AUTH_TROUBLESHOOTING.md
+
+# Quick fix - use HTTPS fallback:
+export GITHUB_PAT=$(gh auth token)
+
+# Or fix SSH agent:
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/id_ed25519
+```
+
+See [GIT_AUTH_TROUBLESHOOTING.md](./GIT_AUTH_TROUBLESHOOTING.md) for detailed git authentication troubleshooting.
+
 ### Debug Mode
 ```bash
 export ADW_DEBUG=true
