@@ -62,6 +62,12 @@ router.get('/:name', async (req, res) => {
     }
 
     const pokemon = await getPokemonByName(name);
+    console.log(`[Local API] Pokemon details fetched for: ${name}`, {
+      hasSprites: !!pokemon.sprites,
+      hasStats: !!pokemon.stats && pokemon.stats.length > 0,
+      hasAbilities: !!pokemon.abilities && pokemon.abilities.length > 0,
+      hasEvolution: !!pokemon.evolution
+    });
     res.json(pokemon);
   } catch (error) {
     console.error('Pokemon detail error:', error);
