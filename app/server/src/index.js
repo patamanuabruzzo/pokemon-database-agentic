@@ -14,7 +14,9 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Pokemon Database API is running' });
 });
 
-// API routes will be added here
+// API routes
+const pokemonRoutes = require('./routes/pokemon');
+app.use('/api/pokemon', pokemonRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
