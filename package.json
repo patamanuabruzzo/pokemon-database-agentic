@@ -3,19 +3,21 @@
   "version": "1.0.0",
   "description": "A practice project for agentic applications with Pokemon search",
   "private": true,
+  "packageManager": "npm@10.0.0",
   "workspaces": [
     "app/client",
     "app/server",
     "agent"
   ],
   "scripts": {
-    "install:all": "npm install && npm install --workspace=app/client && npm install --workspace=app/server && npm install --workspace=agent",
-    "dev:client": "npm run dev --workspace=app/client",
-    "dev:server": "npm run dev --workspace=app/server",
-    "dev:agent": "npm run dev --workspace=agent",
-    "build:client": "npm run build --workspace=app/client",
-    "build:server": "npm run build --workspace=app/server",
-    "start:server": "npm run start --workspace=app/server"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:client": "turbo run dev --filter=@pokemon-db/client",
+    "dev:server": "turbo run dev --filter=@pokemon-db/server",
+    "dev:agent": "turbo run dev --filter=@pokemon-db/agent",
+    "build:client": "turbo run build --filter=@pokemon-db/client",
+    "build:server": "turbo run build --filter=@pokemon-db/server",
+    "start:server": "turbo run start --filter=@pokemon-db/server"
   },
   "keywords": [
     "pokemon",
@@ -26,7 +28,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "turbo": "^2.8.9"
   }
 }
