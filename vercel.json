@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:client:vercel",
+  "buildCommand": "bash build-vercel.sh",
   "outputDirectory": "app/client/dist",
   "devCommand": "npm run dev:client",
-  "installCommand": "npm install",
+  "installCommand": "npm install --legacy-peer-deps",
   "framework": null,
   "routes": [
     {
