@@ -2,9 +2,10 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #FFFFFF;
   border-radius: 0.5rem;
   padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .search-form {
@@ -22,22 +23,22 @@
   width: 100%;
   padding: 0.75rem;
   padding-right: 2.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: #FFFFFF;
+  border: 1px solid #E0E0E0;
   border-radius: 0.375rem;
-  color: #f3f4f6;
+  color: #1A1A1A;
   font-size: 1rem;
   transition: border-color 0.2s, background-color 0.2s;
 }
 
 .search-input::placeholder {
-  color: rgba(243, 244, 246, 0.5);
+  color: #6B6B6B;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #9333ea;
-  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #DC0A2D;
+  background-color: #FFFFFF;
 }
 
 .search-input:disabled {
@@ -52,7 +53,7 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #f3f4f6;
+  color: #6B6B6B;
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -67,7 +68,7 @@
 
 .search-btn {
   padding: 0.75rem 1.5rem;
-  background-color: #9333ea;
+  background-color: #DC0A2D;
   color: white;
   border: none;
   border-radius: 0.375rem;
@@ -79,7 +80,7 @@
 }
 
 .search-btn:hover:not(:disabled) {
-  background-color: #7e22ce;
+  background-color: #B30920;
 }
 
 .search-btn:disabled {
@@ -107,7 +108,7 @@
 .loading-spinner {
   text-align: center;
   padding: 2rem;
-  color: #9333ea;
+  color: #DC0A2D;
   font-size: 1rem;
 }
 
@@ -115,7 +116,7 @@
 .no-results-message {
   text-align: center;
   padding: 2rem;
-  color: rgba(243, 244, 246, 0.6);
+  color: #6B6B6B;
   font-size: 0.875rem;
 }
 
@@ -128,20 +129,20 @@
 
 .result-item {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #E0E0E0;
   cursor: pointer;
   transition: background-color 0.2s;
   text-transform: capitalize;
-  color: #f3f4f6;
+  color: #1A1A1A;
 }
 
 .result-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #F5F5F5;
 }
 
 .result-item.selected {
-  background-color: rgba(147, 51, 234, 0.3);
-  border-left: 3px solid #9333ea;
+  background-color: rgba(220, 10, 45, 0.1);
+  border-left: 3px solid #DC0A2D;
 }
 
 .result-item:last-child {
